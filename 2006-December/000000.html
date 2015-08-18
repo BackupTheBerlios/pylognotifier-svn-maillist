@@ -1,0 +1,437 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Pylognotifier-svn] r13 - trunk/LogNotifier
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/pylognotifier-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:pylognotifier-svn%40lists.berlios.de?Subject=Re%3A%20%5BPylognotifier-svn%5D%20r13%20-%20trunk/LogNotifier&In-Reply-To=%3C200612252033.kBPKXmM9032296%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Pylognotifier-svn] r13 - trunk/LogNotifier</H1>
+    <B>rik0 at mail.berlios.de</B> 
+    <A HREF="mailto:pylognotifier-svn%40lists.berlios.de?Subject=Re%3A%20%5BPylognotifier-svn%5D%20r13%20-%20trunk/LogNotifier&In-Reply-To=%3C200612252033.kBPKXmM9032296%40sheep.berlios.de%3E"
+       TITLE="[Pylognotifier-svn] r13 - trunk/LogNotifier">rik0 at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 25 21:33:48 CET 2006</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: rik0
+Date: 2006-12-25 21:33:33 +0100 (Mon, 25 Dec 2006)
+New Revision: 13
+
+Added:
+   trunk/LogNotifier/Environment.py
+   trunk/LogNotifier/LogNotifier.tmproj
+Removed:
+   trunk/LogNotifier/CommonDefinitions.py
+Modified:
+   trunk/LogNotifier/LogNotifier.py
+   trunk/LogNotifier/LogNotifierAppDelegate.py
+   trunk/LogNotifier/PreferenceBackend.py
+   trunk/LogNotifier/PreferenceModel.py
+Log:
+Added Environment, removed CommonDefinitions.
+
+Deleted: trunk/LogNotifier/CommonDefinitions.py
+===================================================================
+--- trunk/LogNotifier/CommonDefinitions.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/CommonDefinitions.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -1,9 +0,0 @@
+-try:
+-    import Foundation
+-    from Foundation import NSLog
+-    def Log(*args): NSLog(*args)
+-    
+-except ImportError:
+-    import sys
+-    def Log(*args): print &gt;&gt; sys.stderr, args
+-    
+\ No newline at end of file
+
+Added: trunk/LogNotifier/Environment.py
+===================================================================
+--- trunk/LogNotifier/Environment.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/Environment.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -0,0 +1,45 @@
++import os
++import sys
++
++#def _set_darwin():
++#    pass
++#
++#def _log_factory(system):
++#    try:
++#        import Foundation
++#        import AppKit
++#        def Log(*args): 
++#            from Foundation import NSLog
++#            
++#        
++#    except ImportError:
++#        
++#        has_cocoa = False
++
++class DarwinEnvironment(type):
++    try:
++        import Foundation
++        import AppKit
++        import objc
++        has_cocoa = True
++        def Log(cls, *args):
++            from Foundation import NSLog
++            NSLog(*args)
++    except ImportError:
++        has_cocoa = False
++        def Log(*args): 
++            print &gt;&gt; sys.stderr, args
++    try:
++        import Growl
++        has_growl = True
++    except ImportError:
++        has_growl = False
++    
++        
++    
++class Environment(object):
++    system = os.uname()
++    __metaclass__ = eval('%sEnvironment' % system[0].capitalize())
++
++              
++            
+\ No newline at end of file
+
+Modified: trunk/LogNotifier/LogNotifier.py
+===================================================================
+--- trunk/LogNotifier/LogNotifier.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/LogNotifier.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -4,7 +4,7 @@
+ #
+ 
+ from PyObjCTools import NibClassBuilder, AppHelper
+-from Foundation import NSBundle, NSLog, NSUserDefaults
++from Foundation import NSBundle, NSUserDefaults
+ 
+ info = NSBundle.mainBundle().infoDictionary()[u'PyObjCXcode']
+ 
+
+Added: trunk/LogNotifier/LogNotifier.tmproj
+===================================================================
+--- trunk/LogNotifier/LogNotifier.tmproj	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/LogNotifier.tmproj	2006-12-25 20:33:33 UTC (rev 13)
+@@ -0,0 +1,223 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
++&lt;!DOCTYPE plist PUBLIC &quot;-//Apple Computer//DTD PLIST 1.0//EN&quot; &quot;<A HREF="http://www.apple.com/DTDs/PropertyList-1.0.dtd">http://www.apple.com/DTDs/PropertyList-1.0.dtd</A>&quot;&gt;
++&lt;plist version=&quot;1.0&quot;&gt;
++&lt;dict&gt;
++	&lt;key&gt;currentDocument&lt;/key&gt;
++	&lt;string&gt;PreferenceModel.py&lt;/string&gt;
++	&lt;key&gt;documents&lt;/key&gt;
++	&lt;array&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;Alarm.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:18:01Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;CommonDefinitions.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:17:29Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;Environment.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:18:39Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;FileMonitor.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:18:50Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;FileObserver.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:17:25Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;LogNotifier.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:17:16Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;LogNotifierAppDelegate.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:21:55Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;Notifier.py&lt;/string&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;PreferenceBackend.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:22:13Z&lt;/date&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;PreferenceModel.py&lt;/string&gt;
++			&lt;key&gt;lastUsed&lt;/key&gt;
++			&lt;date&gt;2006-12-25T20:26:38Z&lt;/date&gt;
++			&lt;key&gt;selected&lt;/key&gt;
++			&lt;true/&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;setup.py&lt;/string&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;filename&lt;/key&gt;
++			&lt;string&gt;SingletonDecorator.py&lt;/string&gt;
++		&lt;/dict&gt;
++		&lt;dict&gt;
++			&lt;key&gt;expanded&lt;/key&gt;
++			&lt;true/&gt;
++			&lt;key&gt;name&lt;/key&gt;
++			&lt;string&gt;tests&lt;/string&gt;
++			&lt;key&gt;regexFolderFilter&lt;/key&gt;
++			&lt;string&gt;!.*/(\.[^/]*|CVS|_darcs|_MTN|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$&lt;/string&gt;
++			&lt;key&gt;sourceDirectory&lt;/key&gt;
++			&lt;string&gt;tests&lt;/string&gt;
++		&lt;/dict&gt;
++	&lt;/array&gt;
++	&lt;key&gt;fileHierarchyDrawerWidth&lt;/key&gt;
++	&lt;integer&gt;200&lt;/integer&gt;
++	&lt;key&gt;metaData&lt;/key&gt;
++	&lt;dict&gt;
++		&lt;key&gt;Alarm.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;6&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;columnSelection&lt;/key&gt;
++			&lt;false/&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;selectFrom&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;3&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;selectTo&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;6&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++		&lt;/dict&gt;
++		&lt;key&gt;Environment.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;19&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;22&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++		&lt;/dict&gt;
++		&lt;key&gt;FileMonitor.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;6&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;14&lt;/integer&gt;
++		&lt;/dict&gt;
++		&lt;key&gt;LogNotifierAppDelegate.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;18&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;13&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;3&lt;/integer&gt;
++		&lt;/dict&gt;
++		&lt;key&gt;PreferenceBackend.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;6&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;columnSelection&lt;/key&gt;
++			&lt;false/&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;selectFrom&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;3&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;selectTo&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;6&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;2&lt;/integer&gt;
++			&lt;/dict&gt;
++		&lt;/dict&gt;
++		&lt;key&gt;PreferenceModel.py&lt;/key&gt;
++		&lt;dict&gt;
++			&lt;key&gt;caret&lt;/key&gt;
++			&lt;dict&gt;
++				&lt;key&gt;column&lt;/key&gt;
++				&lt;integer&gt;0&lt;/integer&gt;
++				&lt;key&gt;line&lt;/key&gt;
++				&lt;integer&gt;8&lt;/integer&gt;
++			&lt;/dict&gt;
++			&lt;key&gt;firstVisibleColumn&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++			&lt;key&gt;firstVisibleLine&lt;/key&gt;
++			&lt;integer&gt;0&lt;/integer&gt;
++		&lt;/dict&gt;
++	&lt;/dict&gt;
++	&lt;key&gt;openDocuments&lt;/key&gt;
++	&lt;array&gt;
++		&lt;string&gt;Alarm.py&lt;/string&gt;
++		&lt;string&gt;Environment.py&lt;/string&gt;
++		&lt;string&gt;FileMonitor.py&lt;/string&gt;
++		&lt;string&gt;LogNotifierAppDelegate.py&lt;/string&gt;
++		&lt;string&gt;PreferenceBackend.py&lt;/string&gt;
++		&lt;string&gt;PreferenceModel.py&lt;/string&gt;
++	&lt;/array&gt;
++	&lt;key&gt;showFileHierarchyDrawer&lt;/key&gt;
++	&lt;true/&gt;
++	&lt;key&gt;windowFrame&lt;/key&gt;
++	&lt;string&gt;{{278, 207}, {1151, 742}}&lt;/string&gt;
++&lt;/dict&gt;
++&lt;/plist&gt;
+
+Modified: trunk/LogNotifier/LogNotifierAppDelegate.py
+===================================================================
+--- trunk/LogNotifier/LogNotifierAppDelegate.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/LogNotifierAppDelegate.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -11,6 +11,7 @@
+ from Alarm import registerAlarm
+ from FileObserver import fileObserverFactory
+ from Notifier import notifierFactory
++import Environment
+ 
+ PREFERENCES_CHANGED = 'RKLN_PreferencesChanged'
+ 
+@@ -47,7 +48,10 @@
+         
+ # Warning: we have to verify if this is implementation dependent        
+ class PreferenceModel(PreferenceModel, RKLNTableViewDataSource):
+-    '''This way we are mixin in our Cocoa specific methods'''
++    '''PreferenceModel is mixed in with RKLNTableViewDataSource.
++    
++    This could be considered kind of Python black magic.
++    '''
+     pass
+     
+ class NotifierController(NibClassBuilder.AutoBaseClass):
+
+Modified: trunk/LogNotifier/PreferenceBackend.py
+===================================================================
+--- trunk/LogNotifier/PreferenceBackend.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/PreferenceBackend.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -6,8 +6,6 @@
+ #  Copyright (c) 2006 Enrico Franchi. All rights reserved.
+ #
+ 
+-from CommonDefinitions import Log
+-
+ def preferenceBackendFactory():
+     try:
+         import Foundation
+
+Modified: trunk/LogNotifier/PreferenceModel.py
+===================================================================
+--- trunk/LogNotifier/PreferenceModel.py	2006-11-08 14:31:56 UTC (rev 12)
++++ trunk/LogNotifier/PreferenceModel.py	2006-12-25 20:33:33 UTC (rev 13)
+@@ -6,7 +6,6 @@
+ #  Copyright (c) 2006 Enrico Franchi. All rights reserved.
+ #
+ 
+-from CommonDefinitions import Log
+ from PreferenceBackend import preferenceBackendFactory
+ 
+ class EntryInfo(dict):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/pylognotifier-svn">More information about the Pylognotifier-svn
+mailing list</a><br>
+</body></html>

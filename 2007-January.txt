@@ -1,0 +1,287 @@
+From rik0 at mail.berlios.de  Wed Jan  3 10:53:21 2007
+From: rik0 at mail.berlios.de (rik0 at BerliOS)
+Date: Wed, 3 Jan 2007 10:53:21 +0100
+Subject: [Pylognotifier-svn] r14 - trunk/LogNotifier
+Message-ID: <200701030953.l039rLiM019171@sheep.berlios.de>
+
+Author: rik0
+Date: 2007-01-03 10:53:20 +0100 (Wed, 03 Jan 2007)
+New Revision: 14
+
+Modified:
+   trunk/LogNotifier/FileMonitor.py
+   trunk/LogNotifier/FileObserver.py
+   trunk/LogNotifier/LogNotifier.tmproj
+Log:
+Resolved bug with encodings that prevented non ascii chars to be notified
+
+Modified: trunk/LogNotifier/FileMonitor.py
+===================================================================
+--- trunk/LogNotifier/FileMonitor.py	2006-12-25 20:33:33 UTC (rev 13)
++++ trunk/LogNotifier/FileMonitor.py	2007-01-03 09:53:20 UTC (rev 14)
+@@ -46,7 +46,7 @@
+         if self._file.tell() == self.size(): self.update()
+         # This is the right thing to do things. Get raw bytes (and correct numbering)
+         # and encode them correctly only at last
+-        return buf.decode('iso8859-15', 'replace').encode('iso8859-15', 'replace')
++        return buf.decode('iso8859-15', 'replace').encode('utf-8')
+ 
+     def _position_to_end(self):
+         self._file.seek(0, 2)
+
+Modified: trunk/LogNotifier/FileObserver.py
+===================================================================
+--- trunk/LogNotifier/FileObserver.py	2006-12-25 20:33:33 UTC (rev 13)
++++ trunk/LogNotifier/FileObserver.py	2007-01-03 09:53:20 UTC (rev 14)
+@@ -7,6 +7,7 @@
+ #
+ 
+ from Notifier import errorLabel, logLabel, infoLabel
++import Foundation
+ 
+ def fileObserverFactory(notifier, preferenceModel):
+     from FileMonitor import FileMonitor
+
+Modified: trunk/LogNotifier/LogNotifier.tmproj
+===================================================================
+--- trunk/LogNotifier/LogNotifier.tmproj	2006-12-25 20:33:33 UTC (rev 13)
++++ trunk/LogNotifier/LogNotifier.tmproj	2007-01-03 09:53:20 UTC (rev 14)
+@@ -3,50 +3,44 @@
+ <plist version="1.0">
+ <dict>
+ 	<key>currentDocument</key>
+-	<string>PreferenceModel.py</string>
++	<string>FileObserver.py</string>
+ 	<key>documents</key>
+ 	<array>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>Alarm.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:18:01Z</date>
++			<date>2007-01-03T09:18:06Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+-			<string>CommonDefinitions.py</string>
+-			<key>lastUsed</key>
+-			<date>2006-12-25T20:17:29Z</date>
+-		</dict>
+-		<dict>
+-			<key>filename</key>
+ 			<string>Environment.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:18:39Z</date>
++			<date>2007-01-03T09:18:14Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>FileMonitor.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:18:50Z</date>
++			<date>2007-01-03T09:52:21Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>FileObserver.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:17:25Z</date>
++			<date>2007-01-03T09:52:21Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>LogNotifier.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:17:16Z</date>
++			<date>2007-01-03T09:45:28Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>LogNotifierAppDelegate.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:21:55Z</date>
++			<date>2007-01-03T09:51:23Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+@@ -56,15 +50,13 @@
+ 			<key>filename</key>
+ 			<string>PreferenceBackend.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:22:13Z</date>
++			<date>2007-01-03T09:45:25Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+ 			<string>PreferenceModel.py</string>
+ 			<key>lastUsed</key>
+-			<date>2006-12-25T20:26:38Z</date>
+-			<key>selected</key>
+-			<true/>
++			<date>2007-01-03T09:45:27Z</date>
+ 		</dict>
+ 		<dict>
+ 			<key>filename</key>
+@@ -138,86 +130,55 @@
+ 			<key>caret</key>
+ 			<dict>
+ 				<key>column</key>
+-				<integer>6</integer>
++				<integer>65</integer>
+ 				<key>line</key>
+-				<integer>2</integer>
++				<integer>48</integer>
+ 			</dict>
+ 			<key>firstVisibleColumn</key>
+ 			<integer>0</integer>
+ 			<key>firstVisibleLine</key>
+-			<integer>14</integer>
++			<integer>7</integer>
+ 		</dict>
+-		<key>LogNotifierAppDelegate.py</key>
++		<key>FileObserver.py</key>
+ 		<dict>
+ 			<key>caret</key>
+ 			<dict>
+ 				<key>column</key>
+-				<integer>18</integer>
++				<integer>68</integer>
+ 				<key>line</key>
+-				<integer>13</integer>
++				<integer>63</integer>
+ 			</dict>
+ 			<key>firstVisibleColumn</key>
+ 			<integer>0</integer>
+ 			<key>firstVisibleLine</key>
+-			<integer>3</integer>
++			<integer>15</integer>
+ 		</dict>
+-		<key>PreferenceBackend.py</key>
++		<key>LogNotifierAppDelegate.py</key>
+ 		<dict>
+ 			<key>caret</key>
+ 			<dict>
+ 				<key>column</key>
+-				<integer>6</integer>
++				<integer>18</integer>
+ 				<key>line</key>
+-				<integer>2</integer>
++				<integer>13</integer>
+ 			</dict>
+-			<key>columnSelection</key>
+-			<false/>
+ 			<key>firstVisibleColumn</key>
+ 			<integer>0</integer>
+ 			<key>firstVisibleLine</key>
+-			<integer>0</integer>
+-			<key>selectFrom</key>
+-			<dict>
+-				<key>column</key>
+-				<integer>3</integer>
+-				<key>line</key>
+-				<integer>2</integer>
+-			</dict>
+-			<key>selectTo</key>
+-			<dict>
+-				<key>column</key>
+-				<integer>6</integer>
+-				<key>line</key>
+-				<integer>2</integer>
+-			</dict>
++			<integer>84</integer>
+ 		</dict>
+-		<key>PreferenceModel.py</key>
+-		<dict>
+-			<key>caret</key>
+-			<dict>
+-				<key>column</key>
+-				<integer>0</integer>
+-				<key>line</key>
+-				<integer>8</integer>
+-			</dict>
+-			<key>firstVisibleColumn</key>
+-			<integer>0</integer>
+-			<key>firstVisibleLine</key>
+-			<integer>0</integer>
+-		</dict>
+ 	</dict>
+ 	<key>openDocuments</key>
+ 	<array>
+ 		<string>Alarm.py</string>
+ 		<string>Environment.py</string>
+-		<string>FileMonitor.py</string>
+ 		<string>LogNotifierAppDelegate.py</string>
+-		<string>PreferenceBackend.py</string>
+-		<string>PreferenceModel.py</string>
++		<string>FileObserver.py</string>
++		<string>FileMonitor.py</string>
+ 	</array>
+ 	<key>showFileHierarchyDrawer</key>
+ 	<true/>
+ 	<key>windowFrame</key>
+-	<string>{{278, 207}, {1151, 742}}</string>
++	<string>{{300, 212}, {1151, 742}}</string>
+ </dict>
+ </plist>
+
+
+
+From rik0 at mail.berlios.de  Wed Jan  3 10:58:45 2007
+From: rik0 at mail.berlios.de (rik0 at BerliOS)
+Date: Wed, 3 Jan 2007 10:58:45 +0100
+Subject: [Pylognotifier-svn] r15 - trunk/LogNotifier
+Message-ID: <200701030958.l039wj7i019509@sheep.berlios.de>
+
+Author: rik0
+Date: 2007-01-03 10:58:44 +0100 (Wed, 03 Jan 2007)
+New Revision: 15
+
+Modified:
+   trunk/LogNotifier/Info.plist
+   trunk/LogNotifier/setup.py
+Log:
+Updated versions.
+
+Modified: trunk/LogNotifier/Info.plist
+===================================================================
+--- trunk/LogNotifier/Info.plist	2007-01-03 09:53:20 UTC (rev 14)
++++ trunk/LogNotifier/Info.plist	2007-01-03 09:58:44 UTC (rev 15)
+@@ -8,6 +8,8 @@
+ 	<string>LogNotifier</string>
+ 	<key>CFBundleExecutable</key>
+ 	<string>LogNotifier</string>
++	<key>CFBundleGetInfoString</key>
++	<string>LogNotifier, 0.3.3, Copyright 2006 Enrico Franchi</string>
+ 	<key>CFBundleIconFile</key>
+ 	<string>LogNotifier</string>
+ 	<key>CFBundleIdentifier</key>
+@@ -23,11 +25,7 @@
+ 	<key>CFBundleSignature</key>
+ 	<string>????</string>
+ 	<key>CFBundleVersion</key>
+-	<string>0.3.2</string>
+-    <key>CFBundleGetInfoString</key>
+-    <string>LogNotifier, 0.3.2, Copyright 2006 Enrico Franchi</string>
+-    <key>NSHumanReadableCopyright</key>
+-    <string>Copyright 2006 Enrico Franchi</string>
++	<string>0.3.3</string>
+ 	<key>LSHasLocalizedDisplayName</key>
+ 	<false/>
+ 	<key>NSAppleScriptEnabled</key>
+
+Modified: trunk/LogNotifier/setup.py
+===================================================================
+--- trunk/LogNotifier/setup.py	2007-01-03 09:53:20 UTC (rev 14)
++++ trunk/LogNotifier/setup.py	2007-01-03 09:58:44 UTC (rev 15)
+@@ -59,7 +59,7 @@
+ 'license'          : 'BSD license',
+ 'name'             : 'LogNotifier',
+ 'platforms'        : 'MacOS X',
+-'version'          : '0.3.2',
++'version'          : '0.3.3',
+ }
+ 
+ py2app_options = {
+
+
+
